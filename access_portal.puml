@@ -1,0 +1,34 @@
+@startuml
+title Кейс: Доступ через HR-портал
+
+actor "HR Пользователь" as User
+participant "HR-Фронт" as HRFE
+participant "Keycloak" as KC
+participant "HR-BFF" as HRBFF
+participant "Админка HR портала" as RoleSvc
+participant "Сервис доступов" as CD
+
+== Вход HR-пользователя ==
+User -> HRFE++: Открыть HR-портал
+HRFE -> KC++: Авторизация OIDC (логин)
+KC --> HRFE: access_token / id_token
+HRBFF -> KC++: Проверка токена
+KC --> HRBFF: токен валиден (userId, scopes)
+
+== Вызов BFF ==
+HRFE -> HRBFF: GET /user-map (модуль), в Authorization Bearer token
+HRBFF -> CD: отправка запроса user-map
+CD -> HRBFF: получение карты из СД
+HRBFF -> HRFE: доступ на портал разрешен
+
+HRBFF -> RoleSvc++: GET /roles?userId
+RoleSvc --> HRBFF: roles[], attributes[]
+
+
+alt Нет доступа на портал
+  CD --> HRBFF: Возращает бизнес - ошибку: нет доступа
+  HRBFF --> HRFE: 401 UnAuthorized {"error":"Unauthorized"}
+  HRFE --> User: Показать "Отказ в доступе"
+end
+
+@enduml

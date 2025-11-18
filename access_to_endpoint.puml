@@ -1,0 +1,22 @@
+@startuml
+title Кейс: Доступ к кнопке "Договоры"
+
+actor "Менеджер" as User
+participant "Внешний HR портал" as HRFE
+participant "Keycloak" as KC
+participant "Внешний-HR-BFF" as HRBFF
+participant "Админка HR портала" as RoleSvc
+participant "Сервис доступов" as CD
+
+
+HRBFF -> CD: @CheckPermission(permissionCode="ContractAccess", module = "Dios")
+CD -> HRBFF: доступ к получению договоров
+
+
+alt Нет доступа к договорам
+  CD --> HRBFF: Возращает бизнес - ошибку: нет доступа
+  HRBFF --> HRFE: 401 UnAuthorized {"error":"Unauthorized"}
+  HRFE --> User: Показать "Отказ в доступе"
+end
+
+@enduml

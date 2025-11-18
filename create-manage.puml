@@ -1,0 +1,46 @@
+@startuml
+title Создание нового менеджера с ролью
+
+actor "HR Portal" as portal
+participant "BFF" as bff
+database "Админка БД" as admin_db
+participant "Админка Бэк" as back
+participant "Kafka" as kafka
+participant "Сервис состояний" as state_service
+database "Directus CC" as user_db
+participant "Сервис доступов" as access_service
+database "Directus СД" as role_db
+
+== 1. Создание через HR-портал ==
+portal -> bff : Нажать кнопку "Создать"
+activate bff
+bff -> back : POST /manager
+activate back
+
+back -> admin_db : INSERT INTO manager\n(основные данные: ФИО, email, login…)
+activate admin_db
+deactivate admin_db
+
+back -> kafka : Отправить в топик CreatingHrManager\n(данные менеджера + ID)
+activate kafka
+deactivate back
+deactivate bff
+
+kafka -> state_service : Вычитать сообщение о новом менеджере
+activate state_service
+state_service -> user_db : Создать запись в user + outsource\n(связь по userId / managerId)
+activate user_db
+deactivate user_db
+deactivate state_service
+
+state_service -> kafka : Отправить в топик user-access\n(пользователь + доступы)
+deactivate state_service
+
+kafka -> access_service : Получить сообщение о доступах
+activate access_service
+access_service -> role_db : INSERT INTO user/role_user...
+activate role_db
+
+deactivate kafka
+
+@enduml

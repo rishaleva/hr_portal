@@ -1,0 +1,68 @@
+@startuml
+skinparam classAttributeIconSize 0
+skinparam wrapWidth 200
+skinparam linetype ortho
+
+' ==================== Справочники ====================
+class status << (E,LightBlue) Table >> {
+  id : bigint
+  code : string
+  name : string
+}
+
+class role << (E,LightBlue) Table >> {
+  id : bigint
+  code : string
+  name : string
+}
+
+class scope << (E,LightBlue) Table >> {
+  id : bigint
+  code : string
+  name : string
+}
+
+' ==================== Сущности ====================
+class manager << (T,White) Table >> {
+  id : bigint
+  login : string
+  comment : text
+  first_name : string
+  last_name: string
+  middle_name: string
+  email : string
+  phone : string
+  position : string
+  status_uid : uuid
+}
+
+class manager_role << (T,White) Table >> {
+  id : bigint
+  manager_id : bigint
+  role_id : bigint
+}
+
+class manager_access << (T,White) Table >> {
+  id : bigint
+  manager_id : bigint
+  scope_id : bigint
+  value : string
+}
+
+' ==================== Связи ====================
+manager }-- status : status_id → status.id\n(FK, string)
+
+manager_role }-- manager : manager_id → manager.id\n(FK)
+manager_role }-- role : role_id → role.id\n(FK)
+
+manager_access }-- manager : manager_id → manager.id\n(FK)
+manager_access }-- scope : scope_id → scope.id\n(FK)
+
+legend
+  <b>Условные обозначения:</b>
+  << (E,LightBlue) Table >> — Справочник / измерение
+  << (T,White) Table >> — Факт / связующая таблица
+endlegend
+
+
+@enduml
