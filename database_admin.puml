@@ -33,14 +33,10 @@ class manager << (T,White) Table >> {
   email : string
   phone : string
   position : string
-  status_uid : uuid
+  status_id : bigint
+  role_id: bigint
 }
 
-class manager_role << (T,White) Table >> {
-  id : bigint
-  manager_id : bigint
-  role_id : bigint
-}
 
 class manager_access << (T,White) Table >> {
   id : bigint
@@ -51,9 +47,7 @@ class manager_access << (T,White) Table >> {
 
 ' ==================== Связи ====================
 manager }-- status : status_id → status.id\n(FK, string)
-
-manager_role }-- manager : manager_id → manager.id\n(FK)
-manager_role }-- role : role_id → role.id\n(FK)
+manager }-- role : role_id → role.id\n(FK, string)
 
 manager_access }-- manager : manager_id → manager.id\n(FK)
 manager_access }-- scope : scope_id → scope.id\n(FK)
