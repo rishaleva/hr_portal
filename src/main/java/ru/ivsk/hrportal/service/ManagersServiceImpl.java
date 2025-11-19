@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.ivsk.hrportal.controller.manager.dto.ManagerCreateRequest;
 import ru.ivsk.hrportal.controller.manager.dto.ManagersCreateRequest;
+import ru.ivsk.hrportal.exception.ManagerAlreadyExistsException;
 import ru.ivsk.hrportal.exception.ResourceNotFoundException;
 import ru.ivsk.hrportal.repository.ManagerRepository;
 import ru.ivsk.hrportal.repository.RoleRepository;
@@ -14,8 +15,9 @@ import ru.ivsk.hrportal.repository.entity.Manager;
 import ru.ivsk.hrportal.repository.entity.Role;
 import ru.ivsk.hrportal.repository.entity.Status;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -33,6 +35,8 @@ public class ManagersServiceImpl implements ManagerService {
         Status defaultStatus = statusRepository.findByCode(activeStatusCode)
                 .orElseThrow(() -> new ResourceNotFoundException("Статус %s не найден", activeStatusCode));
 
+        validateLoginsNotExist(request);
+        validateNoDuplicateLoginsInRequest(request);
         List<Manager> managersToSave = new ArrayList<>();
 
         for (ManagerCreateRequest man : request.getManagers()) {
@@ -60,5 +64,38 @@ public class ManagersServiceImpl implements ManagerService {
         }
 
         managerRepository.saveAll(managersToSave);
+    }
+
+    private void validateNoDuplicateLoginsInRequest(ManagersCreateRequest request) {
+        List<String> logins = request.getManagers().stream()
+                .map(ManagerCreateRequest::getLogin)
+                .map(String::trim)
+                .toList();
+
+        Set<String> uniqueLogins = new HashSet<>(logins);
+
+        if (logins.size() != uniqueLogins.size()) {
+            Set<String> duplicates = logins.stream()
+                    .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
+                    .entrySet().stream()
+                    .filter(entry -> entry.getValue() > 1)
+                    .map(Map.Entry::getKey)
+                    .collect(Collectors.toSet());
+
+            throw new IllegalArgumentException("Обнаружены дублирующиеся логины в запросе: " + duplicates);
+        }
+    }
+
+    private void validateLoginsNotExist(ManagersCreateRequest request) {
+        List<String> requestedLogins = request.getManagers().stream()
+                .map(ManagerCreateRequest::getLogin)
+                .map(String::trim)
+                .toList();
+
+        List<String> existingLogins = managerRepository.findExistingLogins(requestedLogins);
+
+        if (!existingLogins.isEmpty()) {
+            throw new ManagerAlreadyExistsException("Менеджеры с логинами %s уже существуют!", existingLogins);
+        }
     }
 }
