@@ -1,4 +1,4 @@
-package ru.ivsk.hrportal.controller;
+package ru.ivsk.hrportal.controller.manager;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.ivsk.hrportal.controller.advice.BaseController;
-import ru.ivsk.hrportal.controller.dto.ManagersCreateRequest;
+import ru.ivsk.hrportal.controller.manager.dto.ManagersCreateRequest;
 import ru.ivsk.hrportal.service.ManagerService;
 
 @RestController

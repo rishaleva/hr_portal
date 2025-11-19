@@ -1,4 +1,4 @@
-package ru.ivsk.hrportal.controller.dto;
+package ru.ivsk.hrportal.controller.manager.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;

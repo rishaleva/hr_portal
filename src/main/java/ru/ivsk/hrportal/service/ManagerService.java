@@ -1,6 +1,6 @@
 package ru.ivsk.hrportal.service;
 
-import ru.ivsk.hrportal.controller.dto.ManagersCreateRequest;
+import ru.ivsk.hrportal.controller.manager.dto.ManagersCreateRequest;
 
 public interface ManagerService {
 
