@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="insert-status-data" author="iinozemtseva">
+        <comment>Заполнение справочника статусов: ACTIVE, INACTIVE</comment>
+
+        <insert tableName="status">
+            <column name="name" value="Активный"/>
+            <column name="code" value="ACTIVE"/>
+        </insert>
+
+        <insert tableName="status">
+            <column name="name" value="Неактивный"/>
+            <column name="code" value="INACTIVE"/>
+        </insert>
+    </changeSet>
+
+</databaseChangeLog>

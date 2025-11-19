@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="insert-role-data" author="iinozemtseva">
+        <comment>Заполнение справочника статусов: ACTIVE, INACTIVE</comment>
+
+        <insert tableName="role">
+            <column name="name" value="Главный HR менеджер"/>
+            <column name="code" value="HR_ADMIN"/>
+        </insert>
+
+        <insert tableName="role">
+            <column name="name" value="HR менеджер"/>
+            <column name="code" value="HR_MANAGER"/>
+        </insert>
+    </changeSet>
+
+</databaseChangeLog>

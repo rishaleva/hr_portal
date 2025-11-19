@@ -1,11 +1,11 @@
 package ru.ivsk.hrportal.service;
 
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.ivsk.hrportal.controller.dto.ManagerCreateRequest;
 import ru.ivsk.hrportal.controller.dto.ManagersCreateRequest;
+import ru.ivsk.hrportal.exception.ResourceNotFoundException;
 import ru.ivsk.hrportal.repository.ManagerRepository;
 import ru.ivsk.hrportal.repository.RoleRepository;
 import ru.ivsk.hrportal.repository.StatusRepository;
@@ -24,13 +24,14 @@ public class ManagersServiceImpl implements ManagerService {
     private final ManagerRepository managerRepository;
     private final RoleRepository roleRepository;
     private final StatusRepository statusRepository;
+    private static final String activeStatusCode = "ACTIVE";
 
     @Override
     @Transactional
     public void createManagers(ManagersCreateRequest request) {
 
-        Status defaultStatus = statusRepository.findByCode("ACTIVE")
-                .orElseThrow(() -> new EntityNotFoundException("Статус ACTIVE не найден"));
+        Status defaultStatus = statusRepository.findByCode(activeStatusCode)
+                .orElseThrow(() -> new ResourceNotFoundException("Статус %s не найден", activeStatusCode));
 
         List<Manager> managersToSave = new ArrayList<>();
 
@@ -49,7 +50,8 @@ public class ManagersServiceImpl implements ManagerService {
             manager.setFullName(fullName);
 
             Role role = roleRepository.findByCode(man.getRoleCode())
-                    .orElseThrow(() -> new EntityNotFoundException("Роль " + man.getRoleCode() + " не найдена"));
+                    .orElseThrow(() -> new ResourceNotFoundException("Роль %s не найдена для логина %s",
+                            man.getRoleCode(), man.getLogin()));
 
             manager.setStatus(defaultStatus);
             manager.setRole(role);

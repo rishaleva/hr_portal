@@ -1,23 +1,22 @@
 package ru.ivsk.hrportal.repository.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.Getter;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.UUID;
 
 @Entity
 @Setter
 @Getter
 @NoArgsConstructor
 @Table(name = "manager")
-public class Manager {
+public class Manager extends BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) //если хотим батчинг, то сиквенс
-    private Long id;
+    @Column(name = "uid", nullable = false, updatable = false)
+    private String uid;
+
     private String login;
     private String email; 
     private String phone;
@@ -34,4 +33,9 @@ public class Manager {
     @ManyToOne
     @JoinColumn(name = "role_id", nullable = false)
     private Role role;
+
+    @PrePersist
+    protected void initUid() {
+        this.uid = UUID.randomUUID().toString();
+    }
     }
