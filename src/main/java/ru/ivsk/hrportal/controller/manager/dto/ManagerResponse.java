@@ -1,10 +1,12 @@
 package ru.ivsk.hrportal.controller.manager.dto;
 
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-import java.util.Set;
 
-@Data
+@Getter
+@Setter
 public class ManagerResponse {
     private String login;
     private String email;
@@ -15,15 +17,17 @@ public class ManagerResponse {
     private String middleName;
     private StatusDto status;
     private String comment;
-    private Set<RoleDto> roles;
+    private RoleDto role;
 
-    @Data
+    @Getter
+    @Setter
     public static class StatusDto {
         private String name;
         private String code;
     }
 
-    @Data
+    @Getter
+    @Setter
     public static class RoleDto {
         private String name;
         private String code;
