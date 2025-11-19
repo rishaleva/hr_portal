@@ -11,13 +11,13 @@ import ru.ivsk.hrportal.controller.dto.ManagersCreateRequest;
 import ru.ivsk.hrportal.service.ManagerService;
 
 @RestController
-@RequestMapping("/api/managers")
+@RequestMapping("/api/v1")
 @RequiredArgsConstructor
 public class ManagerController {
 
     private final ManagerService managerService;
 
-    @PostMapping("/manager")
+    @PostMapping("/managers")
     public ResponseEntity<Void> createManagersBulk(
             @Valid @RequestBody ManagersCreateRequest request) {
         managerService.createManagers(request);
