@@ -10,10 +10,6 @@ import lombok.Setter;
 @Table(name = "manager_access")
 public class ManagerAccess extends BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
     @ManyToOne
     @JoinColumn(name = "manager_id")
     private Manager manager;
