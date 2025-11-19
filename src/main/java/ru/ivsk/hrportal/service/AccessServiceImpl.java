@@ -3,10 +3,7 @@ package ru.ivsk.hrportal.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.ivsk.hrportal.controller.access.dto.AccessDto;
-import ru.ivsk.hrportal.controller.access.dto.AccessRequestDto;
-import ru.ivsk.hrportal.controller.access.dto.AccessResponseDto;
-import ru.ivsk.hrportal.controller.access.dto.ManagerLightDto;
+import ru.ivsk.hrportal.controller.access.dto.*;
 import ru.ivsk.hrportal.repository.ManagerAccessRepository;
 import ru.ivsk.hrportal.repository.ManagerRepository;
 import ru.ivsk.hrportal.repository.ScopeRepository;
@@ -95,6 +92,121 @@ public class AccessServiceImpl implements AccessService {
 
         return new AccessResponseDto(managerLogins, accessToGrant);
     }
+
+
+    @Override
+    @Transactional(readOnly = true)
+    public ManagerAccessResponseDto getManagerAccess(String login) {
+
+        Manager manager = managerRepository.findByLogin(login)
+                .orElseThrow(() -> new IllegalArgumentException("Менеджер не найден по логину: " + login));
+
+        List<ManagerAccess> managerAccesses = accessRepository.findByManagerId(manager.getId());
+
+        Map<String, List<String>> accessesByScope = managerAccesses.stream()
+                .collect(Collectors.groupingBy(
+                        access -> access.getScope().getCode(),
+                        Collectors.mapping(ManagerAccess::getValue, Collectors.toList())
+                ));
+
+        List<AccessDto> accessList = accessesByScope.entrySet().stream()
+                .map(entry -> new AccessDto(entry.getKey(), entry.getValue(), entry.getValue().size()))
+                .toList();
+
+        ManagerLightDto managerDto = new ManagerLightDto(
+                manager.getLogin(),
+                manager.getFullName().getFullName(),
+                manager.getRole().getCode()
+        );
+
+        return new ManagerAccessResponseDto(managerDto, accessList);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ManagerAccessResponseDto> getMultipleManagersAccess(List<String> logins) {
+
+        if (logins == null || logins.isEmpty()) {
+            throw new IllegalArgumentException("Список логинов не может быть пустым");
+        }
+
+        List<Manager> managers = managerRepository.findByLoginIn(logins);
+        Map<String, Manager> loginToManager = managers.stream()
+                .collect(Collectors.toMap(Manager::getLogin, Function.identity()));
+
+        validateManagersFound(logins, loginToManager);
+
+        Set<Long> managerIds = managers.stream()
+                .map(Manager::getId)
+                .collect(Collectors.toSet());
+
+        List<ManagerAccess> allAccesses = accessRepository.findByManagerIdIn(managerIds);
+
+        Map<Long, List<ManagerAccess>> accessesByManagerId = allAccesses.stream()
+                .collect(Collectors.groupingBy(access -> access.getManager().getId()));
+
+        return logins.stream()
+                .map(login -> {
+                    Manager manager = loginToManager.get(login);
+                    List<ManagerAccess> managerAccesses = accessesByManagerId.getOrDefault(
+                            manager.getId(), Collections.emptyList());
+                    Map<String, List<String>> accessesByScope = managerAccesses.stream()
+                            .collect(Collectors.groupingBy(
+                                    access -> access.getScope().getCode(),
+                                    Collectors.mapping(ManagerAccess::getValue, Collectors.toList())
+                            ));
+
+                    List<AccessDto> accessList = accessesByScope.entrySet().stream()
+                            .map(entry -> new AccessDto(entry.getKey(), entry.getValue(), entry.getValue().size()))
+                            .toList();
+
+                    ManagerLightDto managerDto = new ManagerLightDto(
+                            manager.getLogin(),
+                            manager.getFullName().getFullName(),
+                            manager.getRole().getCode()
+                    );
+
+                    return new ManagerAccessResponseDto(managerDto, accessList);
+                })
+                .toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<AccessDto> getManagerAccessByScope(String login, String scopeCode) {
+
+        Manager manager = managerRepository.findByLogin(login)
+                .orElseThrow(() -> new IllegalArgumentException("Менеджер не найден по логину: " + login));
+
+        Scope scope = scopeRepository.findByCode(scopeCode)
+                .orElseThrow(() -> new IllegalArgumentException("Scope не найден по коду: " + scopeCode));
+
+        List<ManagerAccess> accesses = accessRepository.findByManagerIdAndScopeId(
+                manager.getId(), scope.getId());
+
+        List<String> values = accesses.stream()
+                .map(ManagerAccess::getValue)
+                .toList();
+
+        return values.isEmpty()
+                ? Collections.emptyList()
+                : List.of(new AccessDto(scopeCode, values, values.size()));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public boolean hasManagerAccess(String login, String scopeCode, String value) {
+
+        Manager manager = managerRepository.findByLogin(login)
+                .orElseThrow(() -> new IllegalArgumentException("Менеджер не найден по логину: " + login));
+
+        Scope scope = scopeRepository.findByCode(scopeCode)
+                .orElseThrow(() -> new IllegalArgumentException("Scope не найден по коду: " + scopeCode));
+
+        return accessRepository.existsByManagerIdAndScopeIdAndValue(
+                manager.getId(), scope.getId(), value);
+    }
+
 
     private void validateRequest(AccessRequestDto request) {
         if (request.logins() == null || request.logins().isEmpty()) {
