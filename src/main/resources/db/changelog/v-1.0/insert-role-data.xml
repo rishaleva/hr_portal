@@ -6,7 +6,6 @@
                         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
 
     <changeSet id="insert-role-data" author="iinozemtseva">
-        <comment>Заполнение справочника статусов: ACTIVE, INACTIVE</comment>
 
         <insert tableName="role">
             <column name="name" value="Главный HR менеджер"/>

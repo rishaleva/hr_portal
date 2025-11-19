@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="insert-scope-data" author="iinozemtseva">
+
+        <insert tableName="scope">
+            <column name="uid" valueComputed="gen_random_uuid()"/>
+            <column name="name" value="Холдинг"/>
+            <column name="code" value="HOLDING"/>
+        </insert>
+
+        <insert tableName="scope">
+            <column name="uid" valueComputed="gen_random_uuid()"/>
+            <column name="name" value="Договор"/>
+            <column name="code" value="CONTRACT"/>
+        </insert>
+
+        <insert tableName="scope">
+            <column name="uid" valueComputed="gen_random_uuid()"/>
+            <column name="name" value="Вариант страхования"/>
+            <column name="code" value="INSURANCE_TYPE"/>
+        </insert>
+
+        <insert tableName="scope">
+            <column name="uid" valueComputed="gen_random_uuid()"/>
+            <column name="name" value="Юридические лица"/>
+            <column name="code" value="LEGAL_PERSON"/>
+        </insert>
+    </changeSet>
+
+</databaseChangeLog>

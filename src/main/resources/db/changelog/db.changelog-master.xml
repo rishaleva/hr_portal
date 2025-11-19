@@ -12,6 +12,7 @@
     <include file="v-1.0/create-manager-access.xml" relativeToChangelogFile="true"/>
     <include file="v-1.0/create-hibernate-seq.xml" relativeToChangelogFile="true"/>
     <include file="v-1.0/insert-status-data.xml" relativeToChangelogFile="true"/>
+    <include file="v-1.0/insert-scope-data.xml" relativeToChangelogFile="true"/>
     <include file="v-1.0/insert-role-data.xml" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>
