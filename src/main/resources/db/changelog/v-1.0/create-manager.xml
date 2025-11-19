@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="create-manager-table" author="iinozemtseva">
+        <createTable tableName="manager">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="login" type="VARCHAR(255)"/>
+            <column name="email" type="VARCHAR(255)"/>
+            <column name="phone" type="VARCHAR(255)"/>
+            <column name="position" type="VARCHAR(255)"/>
+            <column name="first_name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="uid" type="VARCHAR(36)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="middle_name" type="VARCHAR(255)"/>
+            <column name="status_id" type="BIGINT">
+                <constraints nullable="false"
+                             foreignKeyName="fk_manager_status"
+                             references="status(id)"/>
+            </column>
+            <column name="role_id" type="BIGINT">
+                <constraints nullable="false"
+                             foreignKeyName="fk_manager_role"
+                             references="role(id)"/>
+            </column>
+            <column name="comment" type="TEXT"/>
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>
